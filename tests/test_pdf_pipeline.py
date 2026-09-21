@@ -44,3 +44,36 @@ class PDFPipelineTests(unittest.TestCase):
                 page_text[entity.start:entity.end],
                 entity.value,
             )
+
+    def test_detects_email_and_phone_from_pdf(self):
+        with TemporaryDirectory() as directory:
+            pdf_path = Path(directory) / "synthetic_contacts.pdf"
+
+            with pymupdf.open() as document:
+                page = document.new_page()
+                page.insert_text(
+                    (72, 72),
+                    "Email: demo@example.com\n"
+                    "Phone: +998 00 000-00-00",
+                )
+                document.save(str(pdf_path))
+
+            pages = extract_pdf(str(pdf_path))
+            entities = analyze_pages(pages)
+
+            self.assertEqual(
+                [(entity.type, entity.value) for entity in entities],
+                [
+                    ("EMAIL", "demo@example.com"),
+                    ("PHONE", "+998 00 000-00-00"),
+                ],
+            )
+
+            extracted_text = pages[0]["text"]
+
+            for entity in entities:
+                self.assertEqual(entity.page, 1)
+                self.assertEqual(
+                    extracted_text[entity.start:entity.end],
+                    entity.value,
+                )

@@ -1,0 +1,39 @@
+import unittest
+
+from app.analyzer import analyze_pages
+
+
+class AnalyzerTests(unittest.TestCase):
+    def test_combines_email_and_phone_detections(self):
+        text = "Email: demo@example.com. Phone: +7 000 000 00 00."
+
+        entities = analyze_pages([
+            {"page": 2, "text": text},
+        ])
+
+        self.assertEqual(
+            [(entity.type, entity.value) for entity in entities],
+            [
+                ("EMAIL", "demo@example.com"),
+                ("PHONE", "+7 000 000 00 00"),
+            ],
+        )
+
+        for entity in entities:
+            self.assertEqual(entity.page, 2)
+            self.assertEqual(
+                text[entity.start:entity.end],
+                entity.value,
+            )
+
+    def test_handles_docx_record_without_page(self):
+        entities = analyze_pages([
+            {"paragraph": 1, "text": "Phone: +998 00 000-00-00"},
+        ])
+
+        self.assertEqual(len(entities), 1)
+        self.assertEqual(entities[0].type, "PHONE")
+        self.assertIsNone(entities[0].page)
+
+    def test_empty_input(self):
+        self.assertEqual(analyze_pages([]), [])
