@@ -112,3 +112,46 @@ class AnalyzerTests(unittest.TestCase):
             text[entity.start:entity.end],
             entity.value,
         )
+
+    def test_combines_person_and_email(self):
+        # Invented name and reserved example domain.
+        text = (
+            "ФИО: Тестов Пример Макетович. "
+            "Email: demo@example.com."
+        )
+
+        entities = analyze_pages([
+            {"page": 1, "text": text},
+        ])
+
+        self.assertEqual(
+            [(entity.type, entity.value) for entity in entities],
+            [
+                ("EMAIL", "demo@example.com"),
+                ("PERSON", "Тестов Пример Макетович"),
+            ],
+        )
+
+        for entity in entities:
+            self.assertEqual(entity.page, 1)
+            self.assertEqual(
+                text[entity.start:entity.end],
+                entity.value,
+            )
+
+    def test_person_in_docx_record(self):
+        text = "ФИО: Тестов Пример Макетович"
+
+        entities = analyze_pages([
+            {"paragraph": 1, "text": text},
+        ])
+
+        self.assertEqual(len(entities), 1)
+
+        entity = entities[0]
+        self.assertEqual(entity.type, "PERSON")
+        self.assertIsNone(entity.page)
+        self.assertEqual(
+            text[entity.start:entity.end],
+            "Тестов Пример Макетович",
+        )

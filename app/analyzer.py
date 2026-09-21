@@ -3,6 +3,7 @@ from app.detectors.phone import detect_phones
 from app.models.pii import PIIEntity
 from app.detectors.inn import detect_inns
 from app.detectors.passport import detect_passports
+from app.detectors.person import detect_persons
 
 
 def analyze_pages(pages: list[dict]) -> list[PIIEntity]:
@@ -16,5 +17,6 @@ def analyze_pages(pages: list[dict]) -> list[PIIEntity]:
         results.extend(detect_phones(text, page=page_number))
         results.extend(detect_inns(text, page=page_number))
         results.extend(detect_passports(text, page=page_number))
+        results.extend(detect_persons(text, page=page_number))
 
     return results
