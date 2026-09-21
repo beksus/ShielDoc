@@ -37,3 +37,30 @@ class AnalyzerTests(unittest.TestCase):
 
     def test_empty_input(self):
         self.assertEqual(analyze_pages([]), [])
+
+    def test_combines_email_phone_and_inn(self):
+        text = (
+            "Email: demo@example.com. "
+            "Phone: +7 000 000 00 00. "
+            "ИНН: 0000000018."
+        )
+
+        entities = analyze_pages([
+            {"page": 2, "text": text},
+        ])
+
+        self.assertEqual(
+            [(entity.type, entity.value) for entity in entities],
+            [
+                ("EMAIL", "demo@example.com"),
+                ("PHONE", "+7 000 000 00 00"),
+                ("INN", "0000000018"),
+            ],
+        )
+
+        for entity in entities:
+            self.assertEqual(entity.page, 2)
+            self.assertEqual(
+                text[entity.start:entity.end],
+                entity.value,
+            )
