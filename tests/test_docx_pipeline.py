@@ -35,3 +35,37 @@ class DOCXPipelineTests(unittest.TestCase):
                 paragraph_text[entity.start:entity.end],
                 entity.value,
             )
+            
+    def test_detects_email_and_phone_from_docx(self):
+        with TemporaryDirectory() as directory:
+            docx_path = Path(directory) / "synthetic_contacts.docx"
+
+            document = Document()
+            document.add_paragraph("Email: demo@example.com")
+            document.add_paragraph("Phone: +7 (000) 000-00-00")
+            document.save(str(docx_path))
+
+            paragraphs = extract_docx(str(docx_path))
+            entities = analyze_pages(paragraphs)
+
+            self.assertEqual(
+                [(entity.type, entity.value) for entity in entities],
+                [
+                    ("EMAIL", "demo@example.com"),
+                    ("PHONE", "+7 (000) 000-00-00"),
+                ],
+            )
+
+            email, phone = entities
+
+            self.assertIsNone(email.page)
+            self.assertIsNone(phone.page)
+
+            self.assertEqual(
+                paragraphs[0]["text"][email.start:email.end],
+                email.value,
+            )
+            self.assertEqual(
+                paragraphs[1]["text"][phone.start:phone.end],
+                phone.value,
+            )

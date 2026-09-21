@@ -82,3 +82,32 @@ class PhoneDetectorTests(unittest.TestCase):
         text = "+7 000 000\n00 00"
 
         self.assertEqual(detect_phones(text), [])
+
+    def test_parenthesized_code(self):
+        for number in (
+            "+7 (000) 000-00-00",
+            "+7(000)0000000",
+        ):
+            with self.subTest(number=number):
+                text = f"Phone: {number}."
+                entities = detect_phones(text, page=1)
+
+                self.assertEqual(len(entities), 1)
+
+                entity = entities[0]
+                self.assertEqual(entity.value, number)
+                self.assertEqual(entity.page, 1)
+                self.assertEqual(
+                    text[entity.start:entity.end],
+                    number,
+                )
+
+    def test_rejects_malformed_parenthesized_code(self):
+        for number in (
+            "+7 (000 000-00-00",
+            "+7 000) 000-00-00",
+            "+7 (00) 000-00-00",
+            "+7 (000) 000-00-000",
+        ):
+            with self.subTest(number=number):
+                self.assertEqual(detect_phones(number), [])
