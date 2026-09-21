@@ -1,10 +1,10 @@
-import fitz
+import pymupdf
 
 
 def extract_pdf(path: str) -> list[dict]:
     pages = []
 
-    with fitz.open(path) as doc:
+    with pymupdf.open(path) as doc:
         for page_number, page in enumerate(doc, start=1):
             pages.append({
                 "page": page_number,

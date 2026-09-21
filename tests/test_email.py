@@ -25,3 +25,29 @@ class EmailDetectorTests(unittest.TestCase):
         entities = detect_emails("No email address here.")
 
         self.assertEqual(entities, [])
+
+    def test_detects_multiple_emails_in_order(self):
+        text = "demo@example.com, support@example.org; demo@example.com"
+
+        entities = detect_emails(text, page=2)
+
+        self.assertEqual(
+            [entity.value for entity in entities],
+            [
+                "demo@example.com",
+                "support@example.org",
+                "demo@example.com",
+            ],
+        )
+
+        self.assertEqual(
+            [entity.start for entity in entities],
+            [0, 18, 39],
+        )
+
+        for entity in entities:
+            self.assertEqual(entity.page, 2)
+            self.assertEqual(
+                text[entity.start:entity.end],
+                entity.value,
+            )

@@ -7,7 +7,7 @@ def analyze_pages(pages):
     for page in pages:
         entities = detect_emails(
             text=page["text"],
-            page=page["page"]
+            page=page.get("page")
         )
 
         results.extend(entities)

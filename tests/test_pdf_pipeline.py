@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import fitz
+import pymupdf
 
 from app.analyzer import analyze_pages
 from app.extractors.pdf import extract_pdf
@@ -14,7 +14,7 @@ class PDFPipelineTests(unittest.TestCase):
             pdf_path = Path(directory) / "synthetic.pdf"
 
             # Create a PDF containing only synthetic data.
-            with fitz.open() as document:
+            with pymupdf.open() as document:
                 first_page = document.new_page()
                 first_page.insert_text((72, 72), "No email on this page.")
 
