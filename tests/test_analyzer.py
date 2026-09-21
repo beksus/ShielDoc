@@ -64,3 +64,51 @@ class AnalyzerTests(unittest.TestCase):
                 text[entity.start:entity.end],
                 entity.value,
             )
+
+
+    def test_combines_all_four_detectors(self):
+        text = (
+            "Email: demo@example.com. "
+            "Phone: +7 000 000 00 00. "
+            "ИНН: 0000000018. "
+            "Паспорт: серия 0000 номер 000000."
+        )
+
+        entities = analyze_pages([
+            {"page": 2, "text": text},
+        ])
+
+        self.assertEqual(
+            [(entity.type, entity.value) for entity in entities],
+            [
+                ("EMAIL", "demo@example.com"),
+                ("PHONE", "+7 000 000 00 00"),
+                ("INN", "0000000018"),
+                ("PASSPORT", "0000 номер 000000"),
+            ],
+        )
+
+        for entity in entities:
+            self.assertEqual(entity.page, 2)
+            self.assertEqual(
+                text[entity.start:entity.end],
+                entity.value,
+            )
+
+    def test_passport_in_docx_record(self):
+        text = "Паспорт: 0000 000000"
+
+        entities = analyze_pages([
+            {"paragraph": 1, "text": text},
+        ])
+
+        self.assertEqual(len(entities), 1)
+
+        entity = entities[0]
+        self.assertEqual(entity.type, "PASSPORT")
+        self.assertEqual(entity.value, "0000 000000")
+        self.assertIsNone(entity.page)
+        self.assertEqual(
+            text[entity.start:entity.end],
+            entity.value,
+        )
