@@ -33,9 +33,24 @@ def redact_docx(
 
         by_paragraph.setdefault(number, []).append(entity)
 
+    removed_link_ids: set[str] = set()
+
     for number, paragraph_entities in by_paragraph.items():
         paragraph = paragraphs[number - 1]
+
+        # Remember links belonging to the content we will replace.
+        removed_link_ids.update(
+            paragraph._p.xpath(".//w:hyperlink/@r:id")
+        )
+
         paragraph.text = redact_text(paragraph.text, paragraph_entities)
+
+    # A relationship may also be used by an unchanged paragraph.
+    referenced_ids = set(document.element.xpath(".//@r:id"))
+
+    for relationship_id in removed_link_ids:
+        if relationship_id not in referenced_ids:
+            document.part.drop_rel(relationship_id)
 
     # Exclusive creation: fail if the destination already exists.
     with destination.open("xb") as output:

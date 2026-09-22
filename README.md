@@ -109,7 +109,7 @@ Run the full test suite from the repository root:
 python -m unittest discover -s tests -v
 ```
 
-All 66 tests passed in the review virtual environment.
+All 67 tests passed in the review virtual environment.
 
 The suite covers detector logic, analyzer integration, PDF/DOCX extraction,
 text replacement, saving redacted copies, and protection against overwriting
@@ -118,6 +118,9 @@ original or existing files.
 CLI tests verify that missing files, corrupt PDF/DOCX documents, empty PDFs,
 and password-protected PDFs produce readable errors and a nonzero exit code
 without a Python traceback.
+DOCX regression tests verify that redacting hyperlink text also removes
+its unused relationship target, while preserving links still referenced
+elsewhere in the document.
 
 Tests use synthetic data. Document integration tests create temporary files.
 
