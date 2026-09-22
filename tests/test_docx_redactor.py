@@ -39,6 +39,10 @@ class DOCXRedactorTests(unittest.TestCase):
                 ],
             )
             self.assertEqual(source.read_bytes(), original_bytes)
+            remaining_entities = analyze_pages(
+                extract_docx(str(output))
+            )
+            self.assertEqual(remaining_entities, [])
 
     def test_refuses_to_overwrite_source(self):
         with TemporaryDirectory() as directory:

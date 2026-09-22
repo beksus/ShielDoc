@@ -20,7 +20,7 @@ def detect_addresses(
         raw_value = match.group("address")
         value = raw_value.strip()
 
-        if not value:
+        if not value or value == "[REDACTED]":
             continue
 
         leading_spaces = len(raw_value) - len(raw_value.lstrip())

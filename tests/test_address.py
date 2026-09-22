@@ -41,3 +41,16 @@ class AddressDetectorTests(unittest.TestCase):
         ):
             with self.subTest(text=text):
                 self.assertEqual(detect_addresses(text), [])
+
+    def test_ignores_exact_redaction_marker(self):
+        self.assertEqual(
+            detect_addresses("Адрес: [REDACTED]"),
+            [],
+        )
+
+        # Additional address text must still be detected.
+        text = "Адрес: [REDACTED], кв. 0"
+        entities = detect_addresses(text)
+
+        self.assertEqual(len(entities), 1)
+        self.assertEqual(entities[0].value, "[REDACTED], кв. 0")
