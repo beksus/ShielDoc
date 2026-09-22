@@ -14,12 +14,13 @@ def analyze_pages(pages: list[dict]) -> list[PIIEntity]:
         text = record["text"]
         page_number = record.get("page")
 
-        results.extend(detect_emails(text, page=page_number))
-        results.extend(detect_phones(text, page=page_number))
-        results.extend(detect_inns(text, page=page_number))
-        results.extend(detect_passports(text, page=page_number))
-        results.extend(detect_persons(text, page=page_number))
-        results.extend(detect_addresses(text, page=page_number))
+        entities = []
+        entities.extend(detect_emails(text, page=page_number))
+        entities.extend(detect_phones(text, page=page_number))
+        entities.extend(detect_inns(text, page=page_number))
+        entities.extend(detect_passports(text, page=page_number))
+        entities.extend(detect_persons(text, page=page_number))
+        entities.extend(detect_addresses(text, page=page_number))
 
         for entity in entities:
             entity.paragraph = record.get("paragraph")
