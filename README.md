@@ -103,14 +103,23 @@ serialized to bytes and written to a new file.
 
 ## Tests
 
+Run the full test suite from the repository root:
+
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-The current suite contains 60 tests and passed in a fresh virtual environment.
-Tests cover detector behavior, analyzer integration, extraction pipelines, text
-replacement, and saving redacted copies. Fixtures use synthetic data; document
-integration tests create temporary files.
+All 66 tests passed in the review virtual environment.
+
+The suite covers detector logic, analyzer integration, PDF/DOCX extraction,
+text replacement, saving redacted copies, and protection against overwriting
+original or existing files.
+
+CLI tests verify that missing files, corrupt PDF/DOCX documents, empty PDFs,
+and password-protected PDFs produce readable errors and a nonzero exit code
+without a Python traceback.
+
+Tests use synthetic data. Document integration tests create temporary files.
 
 ## Limitations
 

@@ -1,9 +1,9 @@
-# Python
+# Python bytecode
 __pycache__/
 *.py[cod]
 
-# Virtual environment
-.venv/
+# Virtual environments
+.venv*/
 venv/
 
 # IDE
@@ -13,14 +13,12 @@ venv/
 # Environment variables
 .env
 
-# Test/cache
+# Tests and coverage
 .pytest_cache/
 .coverage
+.coverage.*
+htmlcov/
 
 # OS
 .DS_Store
 Thumbs.db
-
-.venv*/
-__pycache__/
-*.py[cod]

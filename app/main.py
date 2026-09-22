@@ -1,5 +1,9 @@
 import argparse
 from pathlib import Path
+from zipfile import BadZipFile
+
+from docx.opc.exceptions import PackageNotFoundError
+from lxml.etree import XMLSyntaxError
 
 from app.analyzer import analyze_pages
 from app.extractors.docx import extract_docx
@@ -35,12 +39,24 @@ def main() -> None:
         if args.output.suffix.lower() != extension:
             parser.error("Output must have the same extension as the input.")
 
-    if extension == ".pdf":
-        records = extract_pdf(str(path))
-    elif extension == ".docx":
-        records = extract_docx(str(path))
-    else:
+    if extension not in (".pdf", ".docx"):
         parser.error("Supported file types: .pdf and .docx")
+
+    try:
+        if extension == ".pdf":
+            records = extract_pdf(str(path))
+        else:
+            records = extract_docx(str(path))
+    except (
+        OSError,
+        RuntimeError,
+        ValueError,
+        PackageNotFoundError,
+        BadZipFile,
+        XMLSyntaxError,
+        KeyError,
+    ) as error:
+        parser.error(f"Cannot read document '{path.name}': {error}")
 
     entities = analyze_pages(records)
     

@@ -81,3 +81,35 @@ class PDFLocationTests(unittest.TestCase):
                 )
 
             self.assertEqual(source.read_bytes(), original_bytes)
+
+    def test_refuses_to_overwrite_source(self):
+        with TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.pdf"
+
+            with pymupdf.open() as document:
+                document.new_page()
+                document.save(str(source))
+
+            original_bytes = source.read_bytes()
+
+            with self.assertRaises(ValueError):
+                redact_pdf(source, source, [])
+
+            self.assertEqual(source.read_bytes(), original_bytes)
+
+    def test_refuses_to_overwrite_existing_output(self):
+        with TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.pdf"
+            output = Path(directory) / "existing.pdf"
+
+            with pymupdf.open() as document:
+                document.new_page()
+                document.save(str(source))
+
+            output.write_bytes(source.read_bytes())
+            original_bytes = output.read_bytes()
+
+            with self.assertRaises(FileExistsError):
+                redact_pdf(source, output, [])
+
+            self.assertEqual(output.read_bytes(), original_bytes)
