@@ -200,3 +200,26 @@ class AnalyzerTests(unittest.TestCase):
             text[entity.start:entity.end],
             entity.value,
         )
+
+    def test_preserves_paragraph_for_repeated_values(self):
+        text = "Email: demo@example.com"
+        records = [
+            {"paragraph": 1, "text": text},
+            {"paragraph": 2, "text": text},
+        ]
+
+        entities = analyze_pages(records)
+
+        self.assertEqual(len(entities), 2)
+        self.assertEqual(
+            [entity.paragraph for entity in entities],
+            [1, 2],
+        )
+
+        for entity in entities:
+            self.assertIsNone(entity.page)
+            paragraph_text = records[entity.paragraph - 1]["text"]
+            self.assertEqual(
+                paragraph_text[entity.start:entity.end],
+                entity.value,
+            )

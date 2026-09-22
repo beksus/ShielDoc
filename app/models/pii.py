@@ -9,3 +9,4 @@ class PIIEntity:
     start: int
     end: int
     confidence: float = 1.0
+    paragraph: int | None = None

@@ -21,4 +21,9 @@ def analyze_pages(pages: list[dict]) -> list[PIIEntity]:
         results.extend(detect_persons(text, page=page_number))
         results.extend(detect_addresses(text, page=page_number))
 
+        for entity in entities:
+            entity.paragraph = record.get("paragraph")
+
+        results.extend(entities)
+
     return results
